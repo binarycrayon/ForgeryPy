@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from unittest import TestCase
+from unittest import TestCase, main
 
 from forgery_py.forgery import date
 
@@ -48,3 +48,13 @@ class DateForgeryTestCase(TestCase):
 
         result = date.date(past=True)
         assert result < today
+
+    def test_datetime(self):
+        now = datetime.datetime.now()
+
+        result = date.time(tzinfo=None)
+        assert result > now
+
+        result = date.time(past=True, tzinfo=None)
+        assert result < now
+

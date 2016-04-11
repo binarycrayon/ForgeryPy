@@ -26,7 +26,7 @@ import random
 
 from ..dictionaries_loader import get_dictionary
 
-__all__ = ['day_of_week', 'month', 'year', 'day', 'date']
+__all__ = ['day_of_week', 'month', 'year', 'day', 'date', 'time', 'UTC']
 
 DAYS = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday',
@@ -50,6 +50,19 @@ MONTHS_ABBR = [
 ]
 
 
+class UTC(datetime.tzinfo):
+    """UTC tzinfo"""
+
+    def utcoffset(self, dt):
+        return datetime.timedelta(0)
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return datetime.timedelta(hours=1)
+
+
 def day_of_week(abbr=False):
     """Random (abbreviated if `abbr`) day of week name."""
     if abbr:
@@ -60,7 +73,7 @@ def day_of_week(abbr=False):
 
 def month(abbr=False, numerical=False):
     """
-    Random (abbreviated if `abbr`) month name or month number if 
+    Random (abbreviated if `abbr`) month name or month number if
     `numerical`.
     """
     if numerical:
@@ -95,3 +108,14 @@ def date(past=False, min_delta=0, max_delta=20):
     """Random `datetime.date` object. Delta args are days."""
     timedelta = datetime.timedelta(days=_delta(past, min_delta, max_delta))
     return datetime.date.today() + timedelta
+
+
+def time(past=False, min_delta=0, max_delta=20, tzinfo=UTC):
+    """Random `datetime.datetime` object. Delta args are seconds.
+    `tzinfo` optional, using UTC timezone by default.
+    """
+    delta = datetime.timedelta(seconds=_delta(past, min_delta, max_delta))
+    if tzinfo and issubclass(tzinfo, datetime.tzinfo):
+        return datetime.datetime.now(tzinfo()) + delta
+    else:
+        return datetime.datetime.now() + delta
